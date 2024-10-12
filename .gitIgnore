@@ -1,0 +1,4 @@
+venv/
+*.fileDownload
+*__pycache__
+ohack.json
