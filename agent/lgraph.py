@@ -1,6 +1,6 @@
 # import bs4
-import os
 import asyncio
+import os
 
 from dotenv import load_dotenv
 from langchain import hub
@@ -18,14 +18,12 @@ from qdrant_client import QdrantClient
 
 load_dotenv()
 
-# prompt = hub.pull("hwchase17/react")
 llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0, openai_api_key=os.getenv('OPENAI_API_KEY'))
 
 
 embedding_model = OpenAIEmbeddings(
     openai_api_key=os.getenv('OPENAI_API_KEY')
 )
-# print(embedding_model)
 qdrant_client = QdrantClient(url = os.getenv('QDRANT_ENDPOINT'), api_key = os.getenv('QDRANT_API_KEY'))
 qdrant_vector_store = QdrantVectorStore(
     client = qdrant_client, 
@@ -36,10 +34,6 @@ qdrant_vector_store = QdrantVectorStore(
     )
 
 retriever = qdrant_vector_store.as_retriever()
-
-# documents = qdrant_vector_store.similarity_search("What are the benifits of sponsering Gin & Jazz is the annual fundraising gala", k=2)
-
-# print(documents[0].page_content,"metadata" ,documents[0].metadata)
 ## Build retriever tool ###
 tool = create_retriever_tool(
     retriever,
@@ -84,8 +78,7 @@ agent_executor = AgentExecutor(agent=agent, tools=tools)
 
 def ask_chat(query, chatHistory=[]):
     # This returns a synchronous generator
-    chathistory_new = []
-    Map the ChatHistory to chatHistory
+    chathistory_new = [] # Map the ChatHistory to chatHistory
     for entry in input_json["ChatHistory"]:
         role = entry["role"]
         content = entry["content"]

@@ -43,7 +43,7 @@ export const ChatWindow: React.FC = () => {
         });
         dispatch(addMessages([userMessage, assistantMessage]));
 
-        fetch('https://ybiaghphzhohf2vcdmdy2v5fvi0aictl.lambda-url.us-east-1.on.aws/', {
+        fetch('http://localhost:80/api', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -53,36 +53,42 @@ export const ChatWindow: React.FC = () => {
                 ChatHistory : ChatHistory
             })
         }).then((response) => {
-            const reader = response.body!.getReader();
-            const decoder = new TextDecoder('utf-8');
-            let message = "";
-            function readStream(): any {
-                return reader.read().then(({ done, value }) => {
-                    if (done) {
-                        console.log('Stream complete');
-                        setisLoading(false);
-                        dispatch(updateChat({id : assistantMessage[CHAT.ID], message : message, isLoading : false}));
-                        return;
-                    }
-                    // if (containerRef.current) {
+            setisLoading(false);
+            //@ts-ignore
+            dispatch(updateChat({id : assistantMessage[CHAT.ID], message : response.output, isLoading : false}));
+
+
+            // const reader = response.body!.getReader();
+
+            // const decoder = new TextDecoder('utf-8');
+            // let message = "";
+            // function readStream(): any {
+            //     return reader.read().then(({ done, value }) => {
+            //         if (done) {
+            //             console.log('Stream complete');
+            //             setisLoading(false);
+            //             dispatch(updateChat({id : assistantMessage[CHAT.ID], message : message, isLoading : false}));
+            //             return;
+            //         }
+            //         // if (containerRef.current) {
                     
-                    //     containerRef.current.scrollTop = containerRef.current.scrollHeight;
-                    // }
-                    message = message + decoder.decode(value, { stream: true })
-                    console.log(message);
-                    // Process the chunk (value) here
-                    dispatch(updateChat({id : assistantMessage[CHAT.ID], message : message, isLoading : true}));
-                    // Read the next chunk
-                    return readStream();
-                }).catch((error: any) => {
-                    console.error('Stream reading error:', error);
-                    alert("Error while data streaming");
-                    dispatch(removeChat(assistantMessage[CHAT.ID]));
-                });
-            }
+            //         //     containerRef.current.scrollTop = containerRef.current.scrollHeight;
+            //         // }
+            //         message = message + decoder.decode(value, { stream: true })
+            //         console.log(message);
+            //         // Process the chunk (value) here
+            //         dispatch(updateChat({id : assistantMessage[CHAT.ID], message : message, isLoading : true}));
+            //         // Read the next chunk
+            //         return readStream();
+            //     }).catch((error: any) => {
+            //         console.error('Stream reading error:', error);
+            //         alert("Error while data streaming");
+            // //         dispatch(removeChat(assistantMessage[CHAT.ID]));
+            //     });
+            // }
 
             // Start reading the stream
-            readStream();
+            // readStream();
         }).catch((e)=>{
             console.log(e);
             alert("Internal Server Erorr");
