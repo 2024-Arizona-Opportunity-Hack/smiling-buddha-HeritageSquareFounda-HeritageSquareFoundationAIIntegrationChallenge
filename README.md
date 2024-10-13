@@ -15,7 +15,8 @@
 - [Rakshilkumar Modi](https://github.com/rhmodi)
 
 ## Project Overview
-`Project Overview` An AI assistant designed to streamline document management for Heritage Square’s Google Drive. The AI retrieves, organizes, and tags documents, improving accuracy and saving time for staff involved in marketing, operations, and grants.
+`Project Overview`
+An AI assistant designed to streamline document management for Heritage Square’s Google Drive. The AI retrieves, organizes, and tags documents, improving accuracy and saving time for staff involved in marketing, operations, and grants.
 
 `Impact for Non-Profits`
 1. Increased Efficiency: Saves staff time by automating document retrieval.
