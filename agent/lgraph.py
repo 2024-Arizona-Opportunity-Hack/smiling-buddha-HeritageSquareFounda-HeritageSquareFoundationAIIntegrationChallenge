@@ -25,32 +25,38 @@ embedding_model = OpenAIEmbeddings(
 )
 # print(embedding_model)
 qdrant_client = QdrantClient(url = os.getenv('QDRANT_ENDPOINT'), api_key = os.getenv('QDRANT_API_KEY'))
-qdrant_vector_store = QdrantVectorStore(client = qdrant_client, collection_name = "Heritage_Square",embedding = embedding_model)
+qdrant_vector_store = QdrantVectorStore(
+    client = qdrant_client, 
+    collection_name = "Heritage_Square",
+    embedding = embedding_model,
+    content_payload_key  = "_node_content",
+    metadata_payload_key = "custom_metadata"
+    )
 
-# retriever = qdrant_vector_store.as_retriever()
+retriever = qdrant_vector_store.as_retriever()
 
-documents = qdrant_vector_store.similarity_search("What are the benifits of sponsering Gin & Jazz is the annual fundraising gala", k=2)
+# documents = qdrant_vector_store.similarity_search("What are the benifits of sponsering Gin & Jazz is the annual fundraising gala", k=2)
 
-print(documents[0].page_content,"metadata" ,documents[0].metadata)
-
-
-# ## Build retriever tool ###
-# tool = create_retriever_tool(
-#     retriever,
-#     "Qdrant_Vector_Search_Retriever",
-#     "Search Documents for the relevant information",
-# )
-# tools = [tool]
+# print(documents[0].page_content,"metadata" ,documents[0].metadata)
 
 
-# agent_executor = create_react_agent(llm, tools, checkpointer=memory)
-# config = {"configurable": {"thread_id": "abc123"}} 
+## Build retriever tool ###
+tool = create_retriever_tool(
+    retriever,
+    "Qdrant_Vector_Search_Retriever",
+    "Search Documents for the relevant information",
+)
+tools = [tool]
 
-# # inputs = {"messages": [("user", "What type of documents you have?")]}
-# query = "What are the benifits of sponsering Gin & Jazz is the annual fundraising gala"
 
-# for event in agent_executor.stream(
-#     {"messages": [HumanMessage(content=query)]},config,
-#     stream_mode="values",
-# ):
-#     event["messages"][-1].pretty_print()
+agent_executor = create_react_agent(llm, tools, checkpointer=memory)
+config = {"configurable": {"thread_id": "abc123"}} 
+
+# inputs = {"messages": [("user", "What type of documents you have?")]}
+query = "What are the benifits of sponsering Gin & Jazz is the annual fundraising gala"
+
+for event in agent_executor.stream(
+    {"messages": [HumanMessage(content=query)]},config,
+    stream_mode="values",
+):
+    event["messages"][-1].pretty_print()

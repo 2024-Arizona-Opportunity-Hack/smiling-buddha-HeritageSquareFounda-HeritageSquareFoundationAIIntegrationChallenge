@@ -58,12 +58,16 @@ export const qdrant_ingestion = async(metadata) =>{
     let documents = await new SimpleDirectoryReader().loadData({directoryPath : directoryPath});
     // @ts-ignore
     documents = documents.map((doc, index) => {
+
+      const obj = {
+        "gDrive_DocID" : metadata.file_id,
+        "dDrive_DocName" : metadata.file_name,
+        "dDrive_DocLink" : metadata.link,
+        "dDrive_DocType" : metadata.file_type,
+      }
       doc.metadata = {
         ...doc.metadata,
-        "gDrive_DocID" : metadata.file_id,
-        "dDRive_DocName" : metadata.file_name,
-        "dDRive_DocLink" : metadata.link,
-        "dDRive_DocType" : metadata.file_type,
+        custom_metadata : obj
 
       }
       return doc;
