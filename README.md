@@ -16,30 +16,32 @@
 
 ## Project Overview
 `Project Overview`
-An AI assistant designed to streamline document management for Heritage Square’s Google Drive. The AI retrieves, organizes, and tags documents, improving accuracy and saving time for staff involved in marketing, operations, and grants.
+An AI assistant designed to streamline document management for Heritage Square’s Google Drive. The AI retrieves, organizes, and tags documents, improving accuracy and saving time for staff involved in marketing, operations, and grants via giving ability to .
 
 `Impact for Non-Profits`
-1. Increased Efficiency: Saves staff time by automating document retrieval.
-2. Cost-Effective: Reduces administrative costs by leveraging low-cost Google Drive storage and scalable AI through OpenAI.
-3. Enhanced Accuracy: Improves accuracy in grant writing and marketing by providing precise document retrieval.
+The organization has thousands of files in Google Drive, making it difficult to find the correct file containing relevant information. Our solution provides a chatbot-like interface to interact with all the documents on Google Drive. It also adds links to the files at the bottom, allowing users to access more detailed information when needed.
 
 ## Features
 1. Automated File Retrieval: Fetches documents from Google Drive using a Google service account.
 2. Document Vectorization: Uses OpenAI to convert documents into vector embeddings for efficient querying.
 3. Intelligent Querying: Responds to user queries by retrieving relevant documents based on vectorized content.
 
+![Alt text](images/Login.png)
+![Alt text](images/ChatUI.png)
 
 
 ## Tech Stack
 - Frontend:ReactJS, TailwindCSS, TypeScript
-- Backend:Python
-- Database:QDrant VectorDB
-- APIs: OpenAI, Google Service Account
+- Backend: Flask
+- Database: QDrant Vector store
+- Authentication: AWS Cognito User pool 
+- APIs: OpenAI, AWS SDK, googleapis
 
 ## Future Improvements
 1. File Categories based on high-level categories.
 2. Implementation of reorganization and sorting features based on parameters like creation date.
 3. Auto-sorting of images (historic vs non-historic).
+4. Move Agent Implementation to Langgraph
 
 
 ## Getting Started
@@ -47,10 +49,17 @@ Instructions on how to set up and run your project locally.
 
 ```bash
 # Example commands
-git clone [your-repo-link]
-cd [your-repo-name]
+git clone git@github.com:2024-Arizona-Opportunity-Hack/smiling-buddha-HeritageSquareFounda-HeritageSquareFoundationAIIntegrationChallenge.git
+cd agent
+python3 -m venv venv 
+source /venv/bin/activate
+pip3 install -r requirements.txt
+python3 app.py
+
+#IN another terminal
+cd UI/Chat_UI
 npm install
-npm start
+npm run dev
 ```
 
 
@@ -74,10 +83,4 @@ Your readme should be a one-stop-shop for the judges to understand your project.
 
 You'll use this repo as your resume in the future, so make it shine! 🌟
 
-Examples of stellar readmes:
-- ✨ [2019 Team 3](https://github.com/2019-Arizona-Opportunity-Hack/Team-3)
-- ✨ [2019 Team 6](https://github.com/2019-Arizona-Opportunity-Hack/Team-6)
-- ✨ [2020 Team 2](https://github.com/2020-opportunity-hack/Team-02)
-- ✨ [2020 Team 4](https://github.com/2020-opportunity-hack/Team-04)
-- ✨ [2020 Team 8](https://github.com/2020-opportunity-hack/Team-08)
-- ✨ [2020 Team 12](https://github.com/2020-opportunity-hack/Team-12)
+
