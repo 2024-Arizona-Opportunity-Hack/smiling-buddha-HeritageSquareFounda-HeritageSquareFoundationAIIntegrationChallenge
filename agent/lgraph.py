@@ -1,5 +1,6 @@
 # import bs4
 import os
+import asyncio
 
 from dotenv import load_dotenv
 from langchain import hub
@@ -13,14 +14,11 @@ from langchain_core.vectorstores import InMemoryVectorStore
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_qdrant import QdrantVectorStore
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langgraph.checkpoint.memory import MemorySaver
-# from langgraph.prebuilt import create_react_agent
 from qdrant_client import QdrantClient
 
 load_dotenv()
 
 # prompt = hub.pull("hwchase17/react")
-memory = MemorySaver()
 llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0, openai_api_key=os.getenv('OPENAI_API_KEY'))
 
 
@@ -56,6 +54,10 @@ template = '''Answer the following questions as best you can. You have access to
 
 Use the following format:
 
+
+You are virual Asistant for Heritage Square Organization. include dDRive_DocName, dDRive_DocLink in markdown format  as [dDRive_DocNames] : [dDRive_DocLink] at the end if you have those values in last message.
+You can look into all the documents and give the answer
+
 Question: the input question you must answer
 Thought: you should always think about what to do
 Action: the action to take, should be one of [{tool_names}]
@@ -64,7 +66,6 @@ Observation: the result of the action
 ... (this Thought/Action/Action Input/Observation can repeat N times)
 Thought: I now know the final answer
 Final Answer: the final answer to the original input question
-You are virual Asistant for Heritage Square Organization. always include dDRive_DocName : dDRive_DocLink in markdown format at the end for all the dDRive_DocNames and dDRive_DocLinks
 
 
 Begin!
@@ -77,29 +78,24 @@ prompt = PromptTemplate.from_template(template)
 
 tools = [tool]
 
-# system_message = "You are virual Asistant for Heritage Sqlare Organization. always include dDRive_DocName : dDRive_DocLink in markdown format at the end for all the dDRive_DocNames and dDRive_DocLinks" 
-# agent_executor = create_react_agent(llm, tools,state_modifier=system_message,  checkpointer=memory)
-
 agent = create_react_agent(llm,tools,prompt)
 agent_executor = AgentExecutor(agent=agent, tools=tools)
 
 
+def ask_chat(query, chatHistory=[]):
+    # This returns a synchronous generator
+    chathistory_new = []
+    Map the ChatHistory to chatHistory
+    for entry in input_json["ChatHistory"]:
+        role = entry["role"]
+        content = entry["content"]
 
-# config = {"configurable": {"thread_id": "abc123"}}
+        if role == "user":
+            chathistory_new.append(HumanMessage(content=content))
+        elif role == "assistant":
+            chathistory_new.append(AIMessage(content=content))
+    return agent_executor.invoke({"input": query, "chat_history": chathistory_new})
 
-# inputs = {"messages": [("user", "What type of documents you have?")]}
-# query = "What are the benifits of sponsering Gin & Jazz is the annual fundraising gala"
 
-# events = agent_executor.stream(
-#     {"messages": [HumanMessage(content=query)]},config,
-#     stream_mode="values",
-# )
-chathistory = []
-while True:
-    user_input = input("User: ")
-    result= agent_executor.invoke({"input":user_input,"chat_history":chathistory})
-    chathistory.append(HumanMessage(content=user_input))
-    chathistory.append(AIMessage(content = result['output']))
-    print(result["output"])
-# for event in events:
-#     event["messages"][-1].pretty_print()
+
+# ask_chat("How are you?")
