@@ -37,7 +37,7 @@ export const ChatWindow: React.FC = () => {
         const ChatHistory = chat.map((item)=>{
             const obj = {
                 role : item[CHAT.USER],
-                content : item[CHAT.MESSAGE]
+                content : item[CHAT.MESSAGE] || ''
             }
             return obj;
         });
@@ -53,46 +53,24 @@ export const ChatWindow: React.FC = () => {
                 ChatHistory : ChatHistory
             })
         }).then((response) => {
-            setisLoading(false);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json()}).then((response) => {
+            console.log(response)
+
+
             //@ts-ignore
-            dispatch(updateChat({id : assistantMessage[CHAT.ID], message : response.output, isLoading : false}));
+            dispatch(updateChat({id : assistantMessage[CHAT.ID], message : response["output"], isLoading : false}));
+
+            setisLoading(false);
 
 
-            // const reader = response.body!.getReader();
 
-            // const decoder = new TextDecoder('utf-8');
-            // let message = "";
-            // function readStream(): any {
-            //     return reader.read().then(({ done, value }) => {
-            //         if (done) {
-            //             console.log('Stream complete');
-            //             setisLoading(false);
-            //             dispatch(updateChat({id : assistantMessage[CHAT.ID], message : message, isLoading : false}));
-            //             return;
-            //         }
-            //         // if (containerRef.current) {
-                    
-            //         //     containerRef.current.scrollTop = containerRef.current.scrollHeight;
-            //         // }
-            //         message = message + decoder.decode(value, { stream: true })
-            //         console.log(message);
-            //         // Process the chunk (value) here
-            //         dispatch(updateChat({id : assistantMessage[CHAT.ID], message : message, isLoading : true}));
-            //         // Read the next chunk
-            //         return readStream();
-            //     }).catch((error: any) => {
-            //         console.error('Stream reading error:', error);
-            //         alert("Error while data streaming");
-            // //         dispatch(removeChat(assistantMessage[CHAT.ID]));
-            //     });
-            // }
-
-            // Start reading the stream
-            // readStream();
         }).catch((e)=>{
+            dispatch(removeChat(assistantMessage[CHAT.ID]));
             console.log(e);
             alert("Internal Server Erorr");
-            dispatch(removeChat(assistantMessage[CHAT.ID]));
         })
     }
 

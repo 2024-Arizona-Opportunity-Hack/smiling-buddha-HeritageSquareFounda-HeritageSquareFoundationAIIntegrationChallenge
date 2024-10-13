@@ -1,13 +1,13 @@
 from flask import Flask, request, jsonify
 import json
 import asyncio
-from Igraph import ask_chat  # Assuming you have a similar OpenAI module in Python
-
-app = Flask(__name__)
-
+from Lgraph import ask_chat
+from flask_cors import CORS
 
 
 app = Flask(__name__, static_folder='build', static_url_path='')
+CORS(app)
+
 
 
 @app.route('/')
@@ -18,15 +18,22 @@ def home():
 @app.route('/api', methods=['POST'])
 async def chat_handler():
     try:
+        # print(request.data)
+        # print(request.get_json())
+
+
         if not request.data:
             return jsonify({"error": "No request body"}), 400
 
         body = request.get_json()
         message = body.get('message')
-        chat_history = body.get('chatHistory')
+        chat_history = body.get('ChatHistory', [])
 
-        if not message or not chat_history:
-            return jsonify({"error": "Missing required fields"}), 400
+        print(message)
+        print(chat_history)
+
+        # if not message or not chat_history:
+        #     return jsonify({"error": "Missing required fields"}), 400
 
         response = await ask_chat({'message': message, 'chatHistory': chat_history})
 
@@ -38,25 +45,5 @@ async def chat_handler():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=80)
-
-
-
-    
-
-
-# async def read_stream(reader, response_stream: ResponseStream):
-#     try:
-#         while True:
-#             chunk = await reader.read()
-#             if chunk is None:
-#                 # End of stream
-#                 response_stream.end()
-#                 break
-            
-#             value = chunk.get("response", {}).get("delta", "")
-#             print(value)
-#             response_stream.write(value)
-#     except Exception as error:
-#         print(f'Stream reading error: {error}')
+    app.run(host="0.0.0.0", port=80, debug=True)
 

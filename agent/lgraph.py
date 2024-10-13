@@ -48,10 +48,7 @@ template = '''Answer the following questions as best you can. You have access to
 
 Use the following format:
 
-
-You are virual Asistant for Heritage Square Organization. include dDRive_DocName, dDRive_DocLink in markdown format  as [dDRive_DocNames] : [dDRive_DocLink] at the end if you have those values in last message.
-You can look into all the documents and give the answer
-
+You are virual Asistant for Heritage Square Organization. always include dDRive_DocName, dDRive_DocLink in markdown format  as [dDRive_DocNames] : [dDRive_DocLink] at the end if you have those values in last message.
 Question: the input question you must answer
 Thought: you should always think about what to do
 Action: the action to take, should be one of [{tool_names}]
@@ -63,7 +60,7 @@ Final Answer: the final answer to the original input question
 
 
 Begin!
-
+Final answer should be in markdown format with proper bullet points and href link
 Question: {input}
 Thought:{agent_scratchpad}'''
 
@@ -76,10 +73,10 @@ agent = create_react_agent(llm,tools,prompt)
 agent_executor = AgentExecutor(agent=agent, tools=tools)
 
 
-def ask_chat(query, chatHistory=[]):
+async def ask_chat(query, chatHistory=[]):
     # This returns a synchronous generator
     chathistory_new = [] # Map the ChatHistory to chatHistory
-    for entry in input_json["ChatHistory"]:
+    for entry in chatHistory:
         role = entry["role"]
         content = entry["content"]
 
