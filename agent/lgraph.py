@@ -8,8 +8,8 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import create_react_agent
 from qdrant_client import QdrantClient
 from langchain_qdrant import QdrantVectorStore
-from langchain_core.messages import HumanMessage
-
+from langchain_core.messages import HumanMessage, BaseMessage, SystemMessage
+from langchain_core.prompts import PromptTemplate
 
 
 
@@ -38,8 +38,6 @@ retriever = qdrant_vector_store.as_retriever()
 # documents = qdrant_vector_store.similarity_search("What are the benifits of sponsering Gin & Jazz is the annual fundraising gala", k=2)
 
 # print(documents[0].page_content,"metadata" ,documents[0].metadata)
-
-
 ## Build retriever tool ###
 tool = create_retriever_tool(
     retriever,
@@ -48,15 +46,16 @@ tool = create_retriever_tool(
 )
 tools = [tool]
 
-
-agent_executor = create_react_agent(llm, tools, checkpointer=memory)
+system_message = "You are virual Asistant for Heritage Sqlare Organization. always include dDRive_DocName : dDRive_DocLink in markdown format at the end for all the dDRive_DocNames and dDRive_DocLinks" 
+agent_executor = create_react_agent(llm, tools,state_modifier=system_message,  checkpointer=memory)
 config = {"configurable": {"thread_id": "abc123"}} 
 
 # inputs = {"messages": [("user", "What type of documents you have?")]}
 query = "What are the benifits of sponsering Gin & Jazz is the annual fundraising gala"
 
-for event in agent_executor.stream(
+events = agent_executor.stream(
     {"messages": [HumanMessage(content=query)]},config,
     stream_mode="values",
-):
+)
+for event in events:
     event["messages"][-1].pretty_print()
