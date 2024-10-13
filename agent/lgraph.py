@@ -8,6 +8,7 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import create_react_agent
 from qdrant_client import QdrantClient
 from langchain_qdrant import QdrantVectorStore
+from langchain_core.messages import HumanMessage
 
 
 
@@ -16,7 +17,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 memory = MemorySaver()
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0, openai_api_key=os.getenv('OPENAI_API_KEY'))
+llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0, openai_api_key=os.getenv('OPENAI_API_KEY'))
 
 
 embedding_model = OpenAIEmbeddings(
@@ -26,28 +27,30 @@ embedding_model = OpenAIEmbeddings(
 qdrant_client = QdrantClient(url = os.getenv('QDRANT_ENDPOINT'), api_key = os.getenv('QDRANT_API_KEY'))
 qdrant_vector_store = QdrantVectorStore(client = qdrant_client, collection_name = "Heritage_Square",embedding = embedding_model)
 
-# vectorstore = InMemoryVectorStore.from_documents(
-#     documents=splits, embedding=OpenAIEmbeddings()
+# retriever = qdrant_vector_store.as_retriever()
+
+documents = qdrant_vector_store.similarity_search("What are the benifits of sponsering Gin & Jazz is the annual fundraising gala", k=2)
+
+print(documents[0].page_content,"metadata" ,documents[0].metadata)
+
+
+# ## Build retriever tool ###
+# tool = create_retriever_tool(
+#     retriever,
+#     "Qdrant_Vector_Search_Retriever",
+#     "Search Documents for the relevant information",
 # )
-retriever = qdrant_vector_store.as_retriever()
+# tools = [tool]
 
 
-### Build retriever tool ###
-tool = create_retriever_tool(
-    retriever,
-    "blog_post_retriever",
-    "Searches and returns excerpts from the Autonomous Agents blog post.",
-)
-tools = [tool]
+# agent_executor = create_react_agent(llm, tools, checkpointer=memory)
+# config = {"configurable": {"thread_id": "abc123"}} 
 
+# # inputs = {"messages": [("user", "What type of documents you have?")]}
+# query = "What are the benifits of sponsering Gin & Jazz is the annual fundraising gala"
 
-graph = create_react_agent(llm, tools, checkpointer=memory)
-config = {"configurable": {"thread_id": "abc123"}} 
-
-inputs = {"messages": [("user", "What type of documents you have?")]}
-for s in graph.stream(inputs, stream_mode="values"):
-    message = s["messages"][-1]
-    if isinstance(message, tuple):
-        print(message)
-    else:
-        message.pretty_print()
+# for event in agent_executor.stream(
+#     {"messages": [HumanMessage(content=query)]},config,
+#     stream_mode="values",
+# ):
+#     event["messages"][-1].pretty_print()
