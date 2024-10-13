@@ -4,3 +4,7 @@
 *.DS_Store
 **/fileDownload/
 **/file_details.json
+
+**/venv/
+
+**/__pycache__
